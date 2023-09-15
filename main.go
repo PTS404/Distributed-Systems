@@ -1,8 +1,8 @@
 package main
 
 import (
-	"sync"
 	"fmt"
+	"sync"
 	"time"
 )
 
@@ -19,6 +19,7 @@ func (p *Philosopher) eat() {
 	//Drops both forks
 	p.leftFork <- false
 	p.rightFork <- false
+	fmt.Printf("Philosopher %d drops forks\n", p.id)
 
 	//Makes sure the same person can't eat twice in a row
 	time.Sleep(time.Millisecond * 100)
@@ -33,10 +34,10 @@ func (p *Philosopher) table(wg *sync.WaitGroup) {
 	for i := 0; p.timesEaten < 3; i++ {
 		p.think()
 
-		/* Avoids deadlock by making sure, that the last philosopher will try to 
-		pick up the right fork first, making the philosopher to his left, able to 
+		/* Avoids deadlock by making sure, that the last philosopher will try to
+		pick up the right fork first, making the philosopher to his left, able to
 		pick up both */
-		if(p.id == 5) {
+		if p.id == 5 {
 			<-p.rightFork
 			<-p.leftFork
 		} else {
@@ -48,13 +49,23 @@ func (p *Philosopher) table(wg *sync.WaitGroup) {
 }
 
 func main() {
-	forks := make([]chan bool, 5) //Channel slice of the five forks
+	forks := make([]chan bool, 5)           //Channel slice of the five forks
 	philosophers := make([]*Philosopher, 5) //Slice of all five philosophers
 
+	//https://gobyexample.com/waitgroups
+	var wg sync.WaitGroup
+
 	for i := 0; i < 5; i++ {
-		forks[i] = make(chan bool, 1)
-		forks[i] <- false //Places forks on the table
+		wg.Add(1)
+		go func(index int) {
+			forks[index] = make(chan bool, 1)
+			forks[index] <- false //Places forks on the table
+			defer wg.Done()
+		}(i)
 	}
+	/* All forks must be initiliazed before making the philosophers.
+	This also avoids a deadlock, since otherwise it would be an empty fork channel. */
+	wg.Wait()
 
 	//Makes the philosophers
 	for i := 0; i < 5; i++ {
@@ -65,9 +76,6 @@ func main() {
 			rightFork:  forks[(i+1)%5], //Will reset i to avoid index out of range exception
 		}
 	}
-
-	//https://gobyexample.com/waitgroups
-	var wg sync.WaitGroup
 
 	//runs for each philosopher
 	for i := 0; i < 5; i++ {
