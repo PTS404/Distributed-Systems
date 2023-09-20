@@ -3,6 +3,8 @@
 ### a) What are packets in your implementation? What data structure do you use to transmit data and meta-data?
 The packets aren't specifically defined but are implemented within a buffer (byte slice), that transmits the data between our client and server. The net package offers the net.conn interface, which handles information in the background.  
 
+The data structure used for transmitting data and meta-data is byte slices ([]byte, <buffer size>)
+
 ### b) Does your implementation use threads or processes? Why is it not realistic to use threads?
 We are using threads to run client and server simultaneously instead of using the nc command to talk to the tcp server. This is because we don't have linux along wanting to provide a simplified way of using/testing the program.
 
