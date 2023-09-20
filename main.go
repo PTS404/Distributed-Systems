@@ -9,22 +9,22 @@ import (
 func main() {
 	var wg sync.WaitGroup
 
-    // Start the server in a goroutine
-    wg.Add(1)
-    go func() {
-        defer wg.Done()
-        server()
-    }()
+	// Start the server in a goroutine
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		server()
+	}()
 
-    // Start the client in a goroutine
-    wg.Add(1)
-    go func() {
-        defer wg.Done()
-        client()
-    }()
+	// Start the client in a goroutine
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		client()
+	}()
 
 	//Wait for the program to finalize
-    wg.Wait()
+	wg.Wait()
 }
 
 func server() {
@@ -68,7 +68,7 @@ func handleConnection(conn net.Conn) {
 
 	//Writes back to the client that the message was received
 	conn.Write([]byte("Message received.\n"))
-	
+
 	//Closes the connection
 	conn.Close()
 }
