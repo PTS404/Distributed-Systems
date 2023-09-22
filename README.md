@@ -6,7 +6,7 @@ The packets aren't specifically defined but are implemented within a buffer (byt
 The data structure used for transmitting data and meta-data is byte slices ([]byte, <buffer .size>)
 
 ### b) Does your implementation use threads or processes? Why is it not realistic to use threads?
-We are using threads to run client and server simultaneously instead of using the nc command to talk to the tcp server. This is because we don't have linux along wanting to provide a simplified way of using/testing the program.
+We are using threads to run client and server concurrently instead of using the nc command to talk to the tcp server. This is because we don't have the linux subsystem and otherwise wanting to provide a simplified way of using/testing the program. In a real world context the client would be separated from the server on a different machine/device.
 
 It is not realistic to use threads since the protocol should run across a network instead of locally. 
 
@@ -19,4 +19,4 @@ Acknowledgements works by waiting until the message has arrived, this can give s
 When assuming the message was never sent, we can use re-transmissions to send the request/message again, and then going through the process again. 
 
 ### e) Why is the 3-way handshake important?
-To make sure both the client and the server are agreeing. Both parts need to acknowledge the message. When both the client and server has a connection, then the TCP can move on, they need to have established connection.
+The 3 way handshake makes sure that theres an established connection. It works by doing two things: it makes sures that both the server and client are ready to transfer the data, and it allows them both to agree on the initial sqeuence numbers, which is sent back and forth during the handshake.
