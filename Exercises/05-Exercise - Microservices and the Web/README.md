@@ -48,7 +48,7 @@ Let us help to reach this objective, by designing a REST api for a webservice, t
   * course teachers, and their student popularity scores
   * student satisfaction ratings for courses
 
-### Exercise 1
+## Exercise 1
 
 Let us create an RPC / gRPC service
 
@@ -57,7 +57,7 @@ Let us create an RPC / gRPC service
   3. Implement the RPC / gRPC service in Golang, that exposes your course endpoint
   4. Consume the RPC / gRPC course service endpoint by creating a client in Golang
 
-### Exercise 2
+## Exercise 2
 Let us examine the if our service is a micro service
 
   1. Discuss which endpoints of your web service \*could\* have a different lifecycle / supporting team. 
@@ -65,7 +65,7 @@ Let us examine the if our service is a micro service
   3. Now, try to re-design your API to a set of microservices, and discuss your architectural choices.
   4. Explain the difference between what is an API and what is a micro service, based on your design
 
-### Exercise 3 - optional 
+## Exercise 3 - optional 
  Let us create an API for a  RPC / REST service:
 
   1. Define service endpoints - **student, course, teacher** using the Swagger editor
@@ -73,7 +73,7 @@ Let us examine the if our service is a micro service
   3. Implement an RPC / REST service in Golang, that exposes your course endpoint
   4. Consume the RPC / REST course service endpoint by creating a client in Golang
 
-### Exercise 4
+## Exercise 4
 Let us debate, when to use REST over HTTP  versus gRPC over HTTP to implement the API for a service:
 
   1. Which of your implementations has a contract for service provider / consumer
