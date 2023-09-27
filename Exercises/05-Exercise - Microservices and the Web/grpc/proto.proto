@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package gRPCIntro;
+
+option go_package = "gRPCIntro/grpc";
+
+service Course {
+  rpc AskForCourse(AskForCourseMessage) returns (CourseMessage);
+}
+
+service Student {
+  rpc AskForStudent(AskForStudentMessage) returns (StudentMessage);
+}
+
+service Teacher {
+  rpc AskForTeacher(AskForTeacherMessage) returns (TeacherMessage);
+}
+
+message AskForStudentMessage{
+  string clientID = 1;
+}
+message AskForCourseMessage{
+  string clientID = 1;
+}
+message AskForTeacherMessage{
+  string clientID = 1;
+}
+
+message CourseMessage {
+  string courseName = 1;
+  string teacher = 2;
+}
+message StudentMessage {
+  string studentName = 1;
+  string course = 2;
+}
+message TeacherMessage {
+  string teacherName = 1;
+  string course = 2;
+}
