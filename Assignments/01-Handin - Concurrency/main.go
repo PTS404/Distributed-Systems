@@ -9,7 +9,14 @@ import (
 type Philosopher struct {
 	id                  int
 	timesEaten          int
-	leftFork, rightFork chan bool //is the fork on the table or not
+	leftFork, rightFork *Fork //is the fork on the table or not
+}
+
+type Fork struct {
+	id        int
+	timesUsed int
+	onTable   chan bool //is the fork on the table or not
+	holder    chan int  //the philosopher who picks up the fork
 }
 
 func (p *Philosopher) eat() {
@@ -17,8 +24,8 @@ func (p *Philosopher) eat() {
 	fmt.Printf("Philosopher %d is eating (count: %d)\n", p.id, p.timesEaten)
 
 	//Drops both forks
-	p.leftFork <- false
-	p.rightFork <- false
+	p.leftFork.onTable <- true
+	p.rightFork.onTable <- true
 	fmt.Printf("Philosopher %d drops forks\n", p.id)
 
 	//Makes sure the same person can't eat twice in a row
@@ -38,34 +45,47 @@ func (p *Philosopher) table(wg *sync.WaitGroup) {
 		pick up the right fork first, making the philosopher to his left, able to
 		pick up both */
 		if p.id == 5 {
-			<-p.rightFork
-			<-p.leftFork
+			<-p.rightFork.onTable
+			<-p.leftFork.onTable
 		} else {
-			<-p.leftFork
-			<-p.rightFork
+			<-p.leftFork.onTable
+			<-p.rightFork.onTable
 		}
+		p.leftFork.holder <- p.id
+		p.rightFork.holder <- p.id
 		p.eat()
 	}
 }
 
+func (f *Fork) forksTable(wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	for i := 0; f.timesUsed < 6; i++ {
+		// philosopher := <-f.holder
+		<-f.holder
+		f.timesUsed++
+		
+		//fmt.Printf("Fork %d has been picked up by Philosopher %d \n", f.id, philosopher)
+	}
+}
+
 func main() {
-	forks := make([]chan bool, 5)           //Channel slice of the five forks
+	forks := make([]*Fork, 5)               //Slice of all five forks
 	philosophers := make([]*Philosopher, 5) //Slice of all five philosophers
 
 	//https://gobyexample.com/waitgroups
 	var wg sync.WaitGroup
 
+	//Makes the forks
 	for i := 0; i < 5; i++ {
-		wg.Add(1)
-		go func(index int) {
-			forks[index] = make(chan bool, 1)
-			forks[index] <- false //Places forks on the table
-			defer wg.Done()
-		}(i)
+		forks[i] = &Fork{
+			id:        i + 1,
+			timesUsed: 0,
+			onTable:   make(chan bool, 1),
+			holder:    make(chan int, 1),
+		}
+		forks[i].onTable <- true //Places forks on the table
 	}
-	/* All forks must be initiliazed before making the philosophers.
-	This also avoids a deadlock, since otherwise it would be an empty fork channel. */
-	wg.Wait()
 
 	//Makes the philosophers
 	for i := 0; i < 5; i++ {
@@ -81,14 +101,21 @@ func main() {
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
 		go philosophers[i].table(&wg)
+
+		wg.Add(1)
+		go forks[i].forksTable(&wg)
 	}
 
 	wg.Wait()
 
 	//Prints how many times each philosopher has eaten in total
 	fmt.Println()
-	fmt.Println("Summary")
+	fmt.Println("Summary:")
 	for i := 0; i < 5; i++ {
 		fmt.Printf("Philosopher %d has eaten %d times\n", philosophers[i].id, philosophers[i].timesEaten)
+	}
+	fmt.Println()
+	for i := 0; i < 5; i++ {
+		fmt.Printf("Fork %d has been used %d times\n", forks[i].id, forks[i].timesUsed)
 	}
 }
