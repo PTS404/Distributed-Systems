@@ -1,0 +1,5 @@
+go 1.21
+
+toolchain go1.21.1
+
+use "Exercises/05-Exercise - Microservices and the Web"
